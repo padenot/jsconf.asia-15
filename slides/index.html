@@ -1,0 +1,505 @@
+<!doctype html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+
+    <title>Elements of dance music</title>
+
+    <meta name="description" content="A framework for easily creating beautiful presentations using HTML">
+    <meta name="author" content="Hakim El Hattab">
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+
+    <link rel="stylesheet" href="css/reveal.css">
+    <link rel="stylesheet" href="css/theme/serif.css" id="theme">
+
+    <!-- Code syntax highlighting -->
+    <link rel="stylesheet" href="lib/css/zenburn.css">
+
+    <!-- Printing and PDF exports -->
+    <script>
+      var link = document.createElement( 'link' );
+      link.rel = 'stylesheet';
+      link.type = 'text/css';
+      link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+      document.getElementsByTagName( 'head' )[0].appendChild( link );
+    </script>
+
+    <style>
+  img {
+    border:none;
+  }
+
+.controlss {
+  background: #f0f1eb;
+  margin: 1em;
+  z-index: 1000;
+  position: absolute;
+  top:0;
+  right: 0;
+}
+pre.plain {
+  margin: 0 auto;
+  --font-size: 0.7em;
+}
+input {
+  margin: 0;
+  padding: 0;
+}
+
+button {
+  width: 4em;
+}
+      strong {
+        color: rgb(230, 0, 0);
+      }
+      input.fader {
+        display: block;
+        margin: 0 auto;
+      }
+      .scope {
+        margin: 0 auto;
+        width: 90%;
+      }
+      div.table {
+        display: table;
+        margin: 0 auto;
+      }
+      .left {
+        display: table-cell;
+        text-align: left;
+        min-width: 10em;
+      }
+      div.right {
+        display: table-cell;
+        text-align: right;
+      }
+    </style>
+
+    <!--[if lt IE 9]>
+    <script src="lib/js/html5shiv.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+
+    <div class="reveal">
+
+      <!-- Any section element inside of this container is displayed as a slide -->
+      <div class="slides">
+        <section>
+          <h1>Elements of dance&nbsp;music</h1>
+          <h3>or, <em>How to make people dance with maths</em></h3>
+          <p>
+          <small>Paul Adenot (@padenot), Mozilla, JSConf.Asia 2015</small>
+          </p>
+        </section>
+
+        <section>
+        <section>
+          <img class=plain src=img/firefox.png style="max-width: 40%">
+        </section>
+        <section>
+          <img class=plain src=img/w3c.svg>
+        </section>
+        <section>
+        <iframe src="https://webaudio.github.io/web-audio-api" style="width:
+          1000px; height:1000px;"></iframe>
+        </section>
+        <section>
+        <img style="max-width: 80%" class=plain src="img/ableton.png">
+        </section>
+        </section>
+
+        <section>
+        <h2>Today !</h2>
+        <ol>
+          <li> What is music? </li>
+          <li> Deconstruction of an <em>acid techno</em> track.</li>
+          <li> How can we use Web Audio to synthetize the sounds from scratch? </li>
+          <li> Actually doing it live !</li>
+          <li> ... ? </li>
+          <li> ... ! </li>
+          <li> Dancing ! </li>
+        </ol>
+        </section>
+
+        <section>
+          <section>
+            <h2> What is music?</h2>
+            <p>My simpl(e|istic) definition.</p>
+          </section>
+          <section>
+          <h2>Music = <em>Rhythm</em> + <em>Melody</em> + <em>Timbre</em></h2>
+          </section>
+          <section>
+            <h2>Rhythm</h2>
+            The <em>absense</em> or <em>presence</em> of a sound at some point
+            in time, and its duration.
+            <p>
+            <em>
+              A note each beat for a quarter beat, 140 times a minute
+            </em>
+            </p>
+          </section>
+          <section>
+            <h2>Melody</h2>
+            A succession of pitched sounds that constitute a coherent unit.
+            <p>
+              <em>
+                A4 - B4 - E4 - A3 - B3
+              </em>
+            </p>
+          </section>
+          <section>
+            <h2>Timbre</h2>
+            The instrinsic sonic characteristics of the sounds themselves.
+            <p>
+            <em>
+              Harsh - pure - pitched - metallic - vocal - bowed
+            </em>
+            </p>
+          </section>
+          <section>
+            <h2>This talk focuses on <em>timbre</em>.</h2>
+          </section>
+        </section>
+
+        <section>
+          <section>
+            <h2>Acid what ?</h2>
+            <h2>Chicago &amp; Detroit, ≈ 1990</h2>
+            <audio src="sound/full.ogg" controls></audio>
+          </section>
+          <section>
+            <h2>Two machines can go far...</h2>
+          </section>
+          <section>
+            <h2> Roland TB-303 </h2>
+            <h4>Bass synthetizer</h4>
+            <img style="width:200%" class=plain src="img/303.png">
+          </section>
+          <section>
+            <h2> Roland TR-808 </h2>
+            <h4>Drum machine</h4>
+            <img style="width:150%" class=plain src="img/808.jpg">
+          </section>
+          <section>
+            <h2>Acid techno deconstruction</h2>
+            <div class=table>
+              <div class=table-row>
+          <div class=left>All mixed </div> <div class=right><audio src="sound/dry.ogg" controls></audio>
+          </div>
+              <div class=table-row>
+                  <div class=left>808 Kick drum       </div> <div class=right><audio
+                    src="sound/kick.ogg" controls></audio></div>
+                </div>
+              <div class=table-row>
+          <div class=left>808 Maracas         </div> <div class=right><audio src="sound/maracas.ogg" controls></audio>
+          </div>
+        </div>
+              <div class=table-row>
+          <div class=left>808 Clap            </div> <div class=right><audio src="sound/clap.ogg" controls></audio>
+          </div>
+        </div>
+              <div class=table-row>
+          <div class=left>Mixed 808 drums     </div> <div class=right><audio src="sound/drums.ogg" controls></audio>
+          </div>
+        </div>
+              <div class=table-row>
+          <div class=left>303 Bass line       </div> <div class=right><audio src="sound/303.ogg" controls></audio>
+          </div>
+          </div>
+              <div class=table-row>
+                <div class=left>Final mix (delay + reverb)</div> <div class=right><audio
+                  src="sound/full.ogg" controls></audio></div>
+              </div>
+          </div>
+        </div>
+          </section>
+          <section>
+            <h2>Why acid techno ?</h2>
+            <ul>
+              <li>Sounds good (at least to me !)</li>
+              <li>Simple to code !</li>
+              <ul>
+                <li>Kick, clap, maracas: TR-808 simulation </li>
+                <li>Bass line: TB-303 simlation </li>
+              </ul>
+            </ul>
+          </section>
+        </section>
+
+        <section>
+          <section>
+          <h2 style='font-family:monospace;'>var ac = new AudioContext</h2>
+          </section>
+          <section>
+          <h2>Web Audio API 101</h2>
+          <style>code { font-family: monospace; }</style>
+<p><code>AudioContext</code> +  <code>AudioNode</code> +  <code>AudioParam</code></p>
+          </section>
+          <section>
+            <img style="max-width: 70%;" class=plain src=/img/graph.svg>
+          </section>
+          <section>
+            <pre style="font-size: 1em;">
+    partial interface AudioContext {
+      readonly attribute AudioNode destination;
+      readonly attribute double currentTime;
+      <span style="opacity: 0.5">// play audio buffers</span>
+      AudioBufferSourceNode createBufferSource();
+      <span style="opacity: 0.5">// change volume </span>
+      GainNode createGain();
+      <span style="opacity: 0.5">// play simple wave forms (sine, square, etc.) </span>
+      OscillatorNode createOscillator();
+      <span style="opacity: 0.5">// filter the sounds </span>
+      BiquadFilterNode createBiquadFilter();
+    }
+            </pre>
+          </section>
+          <section>
+            <pre style="font-size: 1em;">
+            partial interface OscillatorNode {
+              AudioNode connect(AudioNode node);
+              void disconnect(AudioNode node);
+
+              readonly AudioParam frequency;
+              readonly AudioParam detune;
+              enum OscillatorType type;
+
+              void start(double startTime);
+              void stop(double stopTime);
+            }
+            </pre>
+          </section>
+          <section>
+            <pre style="font-size: 0.8em;">
+
+
+    partial interface AudioParam {
+      attribute float value;
+
+      void setValueAtTime(float value, double time);
+      void exponentialRampToValueAtTime(float value, double time);
+      void linearRampToValueAtTime(float value, double time);
+      void setTargetAtTime(float value, double time, float constant);
+    }
+            </pre>
+          </section>
+          <section>
+          <img style="width: 90%;max-width:140%; max-height:140%;" src="img/audioparam.svg">
+          </section>
+          <section>
+          <h2>Basic waveforms</h2>
+            <pre class=plain>
+            var osc = ac.createOscillator();
+            var gain = ac.createGain();
+
+            osc.type = "sine";
+            osc.frequency.value = 440.; // A4
+
+            <strong>input1.oninput = (e) => osc.frequency.value = e.target.value
+            input2.oninput = (e) => gain.gain.value = e.target.value</strong>
+
+            osc.connect(gain);
+            gain.connect(ac.destination);
+
+            osc.start();
+            </pre>
+            <button onclick="simpleSine('.slides', 1);"><img src="img/speaker.svg"></img></button>
+          </section>
+          <section>
+          <h2>Volume enveloppes</h2>
+          <pre class=plain>
+        var osc = ac.createOscillator();
+        osc.frequency.value = 100;
+
+        var gain = ac.createGain();
+        osc.connect(gain);
+        gain.connect(ac.destination)
+
+        osc.start();
+
+        setInterval(function() {
+          <strong>gain.gain.setValueAtTime(1.0, ac.currentTime);
+          gain.gain.setTargetAtTime(0.0, ac.currentTime, 0.3);</strong>
+        }, 500);
+          </pre>
+          <button onclick="gainDecay('.slides', 1);"><img src="img/speaker.svg"></img></button>
+          </section>
+          <section>
+          <h2>Pitch and gain enveloppes: simple kick</h2>
+          <pre class=plain>
+        var osc = ac.createOscillator();
+        var gain = ac.createGain();
+
+        osc.connect(gain);
+        gain.connect(ac.destination)
+
+        osc.start();
+
+        setInterval(function() {
+          gain.gain.setValueAtTime(1.0,  ac.currentTime);
+          gain.gain.setTargetAtTime(0.0, ac.currentTime, 0.12);
+
+          <strong>osc.frequency.setValueAtTime(100.0, ac.currentTime);
+          osc.frequency.setTargetAtTime(45.0, ac.currentTime, 0.07);</strong>
+        }, 300);
+          </pre>
+          <button onclick="fullkick('.slides', 10);"><img src="img/speaker.svg"></img></button>
+          </section>
+          <section>
+            <h2>Detuned sawtooth: bring in the bass!</h2>
+            <pre class=plain>
+        var osc1 = ac.createOscillator();
+        <strong>var osc2 = ac.createOscillator();</strong>
+
+        osc1.type = "sawtooth";
+        <strong>osc2.type = "sawtooth";</strong>
+        osc1.frequency.value = <strong>osc2.frequency.value</strong> = 80;
+
+        <strong>input1.oninput = (e) => osc2.detune.value = e.target.value</strong>
+        input2.oninput = (e) => osc1.frequency.value = osc2.frequency.value = e.target.value
+
+        osc1.connect(ac.destination);
+        osc2.connect(ac.destination);
+
+        osc1.start();
+        osc2.start();
+            </pre>
+            <button onclick="detune('.slides', 1);"><img src="img/speaker.svg"></img></button>
+          </section>
+
+          <section>
+          <h2>A brief excursion to the frequency domain</h2>
+            <pre class=plain>
+            var osc = ac.createOscillator();
+            var gain = ac.createGain();
+
+            osc.type = "sine";
+            osc.frequency.value = 440.; // A4
+
+            <strong>input1.oninput = (e) => osc.frequency.value = e.target.value
+            input2.oninput = (e) => gain.gain.value = e.target.value</strong>
+
+            osc.connect(gain);
+            gain.connect(ac.destination);
+
+            osc.start();
+            </pre>
+            <button onclick="frequency('.slides', 1);"><img src="img/speaker.svg"></img></button>
+          </section>
+          <section>
+          <h2>Filtering the bass</h2>
+            <pre class=plain>
+            var osc = ac.createOscillator(); var osc2 = ac.createOscillator();
+            var gain = ac.createGain();
+            var biquad = ac.createBiquadFilter();
+
+            osc.type = "sawtooth";
+            osc.frequency.value = osc1.frequency.value = 110.; // A2
+            osc2.detune.value = 30;
+            biquad.type = "lowpass";
+
+            <strong>input1.oninput = (e) => biquad.frequency.value = e.target.value
+            input2.oninput = (e) => biquad.gain.value = e.target.value
+            input3.oninput = (e) => biquad.Q.value = e.target.value
+            option.onchange = (e) => biquad.type = e.target.value</strong>
+
+            osc.connect(gain).connect(biquad).connect(ac.destination);
+            osc.start(); osc2.start();
+            </pre>
+            <button onclick="filtering('.slides', 1);"><img src="img/speaker.svg"></img></button>
+          </section>
+          <section>
+          <h2>Noise for the maracas</h2>
+          <pre class=plain>
+            var source = ac.createBufferSource();
+            var buffer = ac.createBuffer(1, 1 * ac.sampleRate, ac.sampleRate);
+            var channel = buffer.getChannelData(0);
+
+            /* [-1, 1] */
+            for (var i = 0; i &lt; channel.length; i++) {
+              channel[i] = Math.random() * 2 - 1;
+            }
+
+            source.loop = true;
+            source.buffer = buffer;
+            source.connect(ac.destination);
+            source.start();
+          </pre>
+          <button onclick="noise('.slides', 1);"><img src="img/speaker.svg"></img></button>
+          </section>
+          <section>
+          <h2>Cheating for the clap...</h2>
+          <pre class=plain>
+            fetch('clap.ogg').then((response) => {
+              response.arrayBuffer().then((arraybuffer) => {
+                <strong>ac.decodeAudioData</strong>(arraybuffer).then((buffer) => {
+                  var source = ac.createBufferSource();
+                  source.buffer = buffer;
+                  source.loop = true;
+                  source.connect(ac.destination);
+                  source.start();
+                });
+              });
+            });
+          </pre>
+          <button onclick="clap('.slides', 1);"><img src="img/speaker.svg"></img></button>
+          </section>
+        </section>
+        <section>
+        <h2>Time to alt-tab to a text editor!</h2>
+        </section>
+        <section>
+          <h2>Thanks !</h2>
+        <p>
+          (More or less) the live coded program in literate style: <br> <a href=https://padenot.github.io/litsynth>https://padenot.github.io/litsynth</a>
+        </p>
+        <p>
+          Search for "Synths secrets" to learn more about synthesis !
+        </p>
+
+          <p>
+            {Twitter, GitHub}: @padenot
+          </p>
+          <p>
+          &lt;padenot@mozilla.com&gt;
+          </p>
+        </section>
+      </div>
+    </div>
+
+    <script src="lib/js/head.min.js"></script>
+    <script src="js/reveal.js"></script>
+    <script src="js/talk.js"></script>
+
+    <script>
+
+      // Full list of configuration options available at:
+      // https://github.com/hakimel/reveal.js#configuration
+      Reveal.initialize({
+        width: "100%",
+        height: "100%",
+        history: true,
+        controls: true,
+        progress: false,
+
+        transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+        // Optional reveal.js plugins
+        dependencies: [
+          { src: 'plugin/zoom-js/zoom.js', async: true },
+          { src: 'plugin/notes/notes.js', async: true }
+        ]
+      });
+
+    </script>
+
+  </body>
+</html>

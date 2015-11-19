@@ -1,0 +1,13 @@
+<script src=js/talk.js>
+</script>
+<script>
+window.onload = function() {
+  var osc = simpleSine();
+  document.querySelector("input").oninput = function(e) {
+    osc.frequency.value = e.target.value;
+  }
+}
+</script>
+<section style="height: 30%; width:30%">
+</section>
+<input type=range min=10 max=1000 step=1>

@@ -1,0 +1,224 @@
+<meta charset=utf-8>
+<script>
+stop = false;
+function note2freq(note) {
+  return Math.pow(2, (note - 69) / 12) * 440;
+}
+
+FREQ = 3000;
+
+var track = {
+  tempo: 135,
+  tracks: {
+    Kick: [ 1, 0, 0, 0, 1, 0, 0, 0,
+            1, 0, 0, 0, 1, 0, 0, 0,
+            1, 0, 0, 0, 1, 0, 0, 0,
+            1, 0, 0, 0, 1, 0, 0, 0],
+    Hats: [ 0, 0, 1, 0, 0, 0, 1, 0,
+            0, 0, 1, 0, 0, 0, 1, 1,
+            0, 0, 1, 0, 0, 0, 1, 0,
+            0, 0, 1, 0, 0, 0, 1, 0 ],
+    Clap: [ 0, 0, 0, 0, 1, 0, 0, 0,
+            0, 0, 0, 0, 1, 0, 0, 0,
+            0, 0, 0, 0, 1, 0, 0, 0,
+            0, 0, 0, 0, 1, 0, 0, 0],
+    Bass: [36, 0,38,36,36,38,41, 0,
+           36,60,36, 0,39, 0,48, 0,
+           36, 0,24,60,40,40,24,24,
+           36,60,36, 0,39, 0,48, 0 ]
+  }
+};
+
+function S(ac, clap, track) {
+  this.ac = ac;
+  this.track = track;
+  this.sink = ac.destination;
+  this.clap = clap;
+}
+
+S.prototype.NoiseBuffer = function() {
+  if (!S._NoiseBuffer) {
+    S._NoiseBuffer =
+      this.ac.createBuffer(1,
+                           this.ac.sampleRate,
+                           this.ac.sampleRate);
+    var cd = S._NoiseBuffer.getChannelData(0);
+    for (var i = 0; i < cd.length; i++) {
+      cd[i] = Math.random() * 2 - 1;
+    }
+  }
+  return S._NoiseBuffer;
+}
+
+// time is in fractional beat
+S.prototype.clock = function() {
+  var beatLen = 60 / this.track.tempo;
+  return (this.ac.currentTime - this.startTime) / beatLen;
+}
+
+// starts the tune
+S.prototype.start = function() {
+  this.startTime = this.ac.currentTime;
+  this.nextScheduling = 0;
+  this.scheduler();
+}
+
+S.prototype.scheduler = function() {
+  var beatLen = 60 / this.track.tempo;
+
+  var lookahead = 0.5;
+
+  if (stop) {
+    return;
+  }
+
+  if (this.clock() + lookahead > this.nextScheduling) {
+    var steps = [];
+    steps.push(this.nextScheduling + beatLen / 4);
+
+    for (var i in this.track.tracks) {
+      for (var j = 0; j < steps.length; j++) {
+        var idx = Math.round(steps[j] / ((beatLen / 4)));
+
+        var note =
+  this.track.tracks[i][idx % this.track.tracks[i].length];
+
+        if (note != 0) {
+          this[i](steps[j], note);
+        }
+      }
+    }
+
+    this.nextScheduling += (60 / this.track.tempo / 4);
+  }
+
+  setTimeout(this.scheduler.bind(this), 15);
+}
+
+S.prototype.Kick = function(t) {
+  var osc = this.ac.createOscillator();
+  var gain = this.ac.createGain();
+  var osc2 = this.ac.createOscillator();
+  var gain2 = this.ac.createGain();
+
+  osc.type = "sine";
+  osc2.type = "square";
+
+  osc2.frequency.value = "40";
+
+  osc.connect(gain).connect(this.sink);
+  osc2.connect(gain2).connect(this.sink);
+
+  osc.frequency.setValueAtTime(100, t);
+  osc.frequency.setTargetAtTime(50, t, 0.05);
+
+  gain.gain.setValueAtTime(1.0, t);
+  gain.gain.setTargetAtTime(0.0, t, 0.1);
+
+  gain2.gain.setValueAtTime(1.0, t);
+  gain2.gain.setTargetAtTime(0.0, t, 0.01);
+
+  osc.start(t);
+  osc.stop(t + 1.0);
+  osc2.start(t);
+  osc2.stop(t + 1.0);
+}
+
+S.prototype.Hats = function(t) {
+  var s = this.ac.createBufferSource();
+
+  s.buffer = this.NoiseBuffer();
+
+  var gain = this.ac.createGain();
+
+  var hpf = this.ac.createBiquadFilter();
+
+  hpf.type = "highpass";
+
+  hpf.frequency.value = 5000;
+
+  gain.gain.setValueAtTime(1.0, t);
+  gain.gain.setTargetAtTime(0.0, t, 0.02);
+
+  s.connect(gain).connect(hpf).connect(this.sink);
+
+  s.start(t);
+}
+
+S.prototype.Clap = function(t) {
+  var source = this.ac.createBufferSource();
+  
+  var gain = this.ac.createGain();
+
+  source.connect(gain).connect(this.sink);
+
+  source.buffer = this.clap;
+
+  source.start(t);
+}
+
+S.prototype.Bass = function(t, note) {
+  var osc1 = this.ac.createOscillator();
+  var osc2 = this.ac.createOscillator();
+  var gain = this.ac.createGain();
+  var filter = this.ac.createBiquadFilter();
+
+  osc1.connect(filter).connect(gain).connect(this.sink);
+  osc2.connect(filter);
+
+  osc1.frequency.setValueAtTime(note2freq(note), t);
+  osc2.frequency.setValueAtTime(note2freq(note), t);
+
+  osc2.detune.value = 20;
+
+  osc1.type = "sawtooth";
+  osc2.type = "sawtooth";
+
+  gain.gain.setValueAtTime(0.3, t);
+  gain.gain.setTargetAtTime(0.0, t, 0.1);
+
+  filter.Q.setValueAtTime(20, t);
+
+  filter.frequency.setValueAtTime(300, t);
+  filter.frequency.setTargetAtTime(FREQ, t, 0.01);
+
+  filter.type = "lowpass";
+
+  osc1.start(t);
+  osc2.start(t);
+  osc1.stop(t+1);
+  osc2.stop(t+1);
+}
+
+window.onload = function() {
+  fetch("clap.ogg").then((response) => {
+    response.arrayBuffer().then((arrayBuffer) => {
+      ac = new AudioContext();
+      ac.decodeAudioData(arrayBuffer).then((clap) => {
+        var s = new S(ac, clap, track);
+        s.start();
+      });
+    });
+  });
+
+  var slider = document.createElement("input");
+  slider.type = "range";
+  slider.min = 1000;
+  slider.max = 10000;
+  slider.step = 1;
+
+  slider.oninput = (e) => {
+    FREQ = e.target.value;
+  }
+
+  document.body.appendChild(slider);
+
+  document.querySelector("button").onclick = () => {
+    stop = true;
+    ac.close();
+  }
+}
+</script>
+<button>
+  Stop !
+</button>
