@@ -96,11 +96,11 @@ S.prototype.Kick = function(t) {
   osc2.connect(gain2);
   gain2.connect(this.sink);
 
-  osc.frequency.setValueAtTime(120.0, t);
-  osc.frequency.setTargetAtTime(50.0, t, 0.05);
+  osc.frequency.setValueAtTime(50.0, t);
+  osc.frequency.setTargetAtTime(35.0, t, 0.02);
 
   gain.gain.setValueAtTime(1.0, t);
-  gain.gain.setTargetAtTime(0.0, t, 0.1);
+  gain.gain.setTargetAtTime(0.0, t, 0.25);
   gain2.gain.setValueAtTime(0.5, t);
   gain2.gain.setTargetAtTime(0.0, t, 0.01);
 
@@ -134,12 +134,31 @@ S.prototype.Hats = function(t) {
 
   hpf.type = "highpass";
 
-  hpf.frequency.value = 5000;
+  hpf.frequency.value = 8000;
 
   g.gain.setValueAtTime(1.0, t);
-  g.gain.setTargetAtTime(0.0, t, 0.02);
+  g.gain.setTargetAtTime(0.0, t, 0.015);
 
-  s.connect(g).connect(this.sink);
+  s.connect(g);
+
+  var delay = this.ac.createDelay();
+  var fb = this.ac.createGain();
+  var panner = this.ac.createStereoPanner();
+
+  delay.connect(fb);
+  fb.connect(delay);
+  g.connect(this.sink);
+  g.connect(panner);
+  panner.connect(delay);
+  delay.connect(this.sink);
+  var osc = this.ac.createOscillator();
+  osc.type = "square";
+  osc.frequency.value = (60 / 140 / 8) * 3;
+  osc.connect(panner.pan);
+  osc.start(t);
+
+  fb.gain.value = 0.5;
+  delay.delayTime.value = (60/140/8)*3;
 
   s.start(t);
 }
@@ -155,6 +174,7 @@ S.prototype.Clap = function(t) {
   s.start(t);
 }
 
+
 S.prototype.Bass = function(t, note) {
   var osc1 = this.ac.createOscillator();
   var osc2 = this.ac.createOscillator();
@@ -166,25 +186,26 @@ S.prototype.Bass = function(t, note) {
   osc1.connect(filter).connect(gain);
   osc2.connect(filter);
 
-  gain.connect(this.sink);
-
   osc1.frequency.setValueAtTime(note2freq(note), t);
   osc2.frequency.setValueAtTime(note2freq(note), t);
 
-  osc2.detune.value = 20;
+  osc2.detune.value = 13;
 
   osc1.type = "sawtooth";
   osc2.type = "sawtooth";
 
-  gain.gain.setValueAtTime(0.3, t);
+  gain.gain.setValueAtTime(0.1, t);
   gain.gain.setTargetAtTime(0.0, t, 0.1);
 
-  filter.Q.setValueAtTime(20, t);
+  filter.Q.setValueAtTime(25, t);
 
   filter.frequency.setValueAtTime(300, t);
-  filter.frequency.setTargetAtTime(3000, t, 0.01);
+  filter.frequency.setTargetAtTime(8000, t, 0.01);
+
 
   filter.type = "lowpass";
+
+  gain.connect(this.sink);
 
   osc1.start(t);
   osc2.start(t);
@@ -193,20 +214,19 @@ S.prototype.Bass = function(t, note) {
 }
 
 window.onload = function() {
-
   fetch("clap.ogg").then((response) => {
-    response.arrayBuffer().then((arrayBuffer) => {
-    ac = new AudioContext();
-    ac.decodeAudioData(arrayBuffer).then((clap) => {
-      var s = new S(ac, clap, track);
-      s.start();
-      });
-      });
-  });
+      response.arrayBuffer().then((arrayBuffer) => {
+        ac = new AudioContext();
+        ac.decodeAudioData(arrayBuffer).then((clap) => {
+          var s = new S(ac, null, track);
+          s.start();
+          });
+        });
   document.querySelector("button").onclick = function() {
     stop = true;
     ac.close();
   }
+});
 }
 </script>
 <button>
