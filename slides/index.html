@@ -30,6 +30,24 @@
     </script>
 
     <style>
+.reveal blockquote {
+  box-shadow:none;
+}
+blockquote p:before{
+  content: "«";
+}
+blockquote p:after{
+  content: "»";
+}
+blockquote p {
+  border-left: 10px solid gray !important;
+}
+blockquote p strong {
+  color: black;
+}
+blockquote footer {
+  text-align: right;
+}
   img {
     border:none;
   }
@@ -95,7 +113,7 @@ button {
           <h1>Elements of dance&nbsp;music</h1>
           <h3>or, <em>How to make people dance with maths</em></h3>
           <p>
-          <small>Paul Adenot (@padenot), Mozilla, JSConf.Asia 2015</small>
+          <small>Paul Adenot (@padenot), Mozilla, SINFO 23</small>
           </p>
         </section>
 
@@ -107,8 +125,8 @@ button {
           <img class=plain src=img/w3c.svg>
         </section>
         <section>
-        <iframe src="https://webaudio.github.io/web-audio-api" style="width:
-          1000px; height:1000px;"></iframe>
+        <!--<iframe src="https://webaudio.github.io/web-audio-api" style="width:-->
+          <!--1000px; height:1000px;"></iframe>-->
         </section>
         <section>
         <img style="max-width: 80%" class=plain src="img/ableton.png">
@@ -120,7 +138,8 @@ button {
         <ol>
           <li> What is music? </li>
           <li> Deconstruction of an <em>acid techno</em> track.</li>
-          <li> How can we use Web Audio to synthetize the sounds from scratch? </li>
+          <li> Rich audio on the web ? </li>
+          <li> Web Audio Primer </li>
           <li> Actually doing it live !</li>
           <li> ... ? </li>
           <li> ... ! </li>
@@ -225,70 +244,141 @@ button {
             <h2>Why acid techno ?</h2>
             <ul>
               <li>Sounds good (at least to me !)</li>
-              <li>Simple to code !</li>
+              <li>Simple to code !
               <ul>
-                <li>Kick, clap, maracas: TR-808 simulation </li>
-                <li>Bass line: TB-303 simlation </li>
-              </ul>
-            </ul>
+                <ul>
+                  <li>Kick, clap, maracas: TR-808 simulation </li>
+                  <li>Bass line: TB-303 simlation </li>
+                </ul>
+              </ul></li>
           </section>
         </section>
 
         <section>
           <section>
-          <h2 style='font-family:monospace;'>var ac = new AudioContext</h2>
+          <h2> The Web Audio API </h2>
           </section>
+          <section>
+          <blockquote>
+            <p>
+            This specification describes a <strong>high-level JavaScript
+              API for
+              processing and synthesizing audio in web
+              applications</strong> [&hellip;]
+            </p>
+            <footer>
+            <a href="https://webaudio.github.io/web-audio-api/#abstract">Web
+              Audio API specification's abstract</a>
+            </footer>
+      </blockquote>
+
+          </section>
+          <section>
+          <blockquote>
+            <p>
+          [&hellip;] The primary paradigm is of an <strong>audio routing graph</strong>,
+            where a number of <strong>AudioNode</strong> objects are
+            <strong>connected together</strong> to define the overall audio
+            rendering. [&hellip;]
+            </p>
+            <footer>
+            <a href="https://webaudio.github.io/web-audio-api/#abstract">Web
+              Audio API specification's abstract</a>
+            </footer>
+          </blockquote>
+          </section>
+          <section>
+          <blockquote>
+            <p>
+              [&hellip;] The actual processing will primarily take place in the <strong>underlying
+              implementation</strong> (typically optimized Assembly / C / C++ code), but
+              <strong>direct JavaScript processing and synthesis</strong> is also supported.
+            </p>
+            <footer>
+            <a href="https://webaudio.github.io/web-audio-api/#abstract">Web
+              Audio API specification's abstract</a>
+            </footer>
+          </blockquote>
+          </section>
+          <section>
+          <h2>But &hellip; why ?</h2>
+          <em>insert rant about JavaScript</em>
+          </section>
+          <section>
+            <ol>
+              <li>Distribution mechanism</li>
+              <li>Performance</li>
+              <li>Ease-of-use</li>
+              <li>Composability</li>
+            </ol>
+          </section>
+          <section>
+          <h2>Distribution mechanism</h2>
+          </section>
+          <section>
+          <h2>Performance</h2>
+          </section>
+          <section>
+          <h2>Ease-of-use</h2>
+          </section>
+          <section>
+          <h2>Composability</h2>
+          </section>
+          </section>
+          <section>
           <section>
           <h2>Web Audio API 101</h2>
           <style>code { font-family: monospace; }</style>
 <p><code>AudioContext</code> +  <code>AudioNode</code> +  <code>AudioParam</code></p>
           </section>
           <section>
+          <h2 style='font-family:monospace;'>var ac = new AudioContext</h2>
+          </section>
+          <section>
             <img style="max-width: 70%;" class=plain src=/img/graph.svg>
           </section>
           <section>
             <pre style="font-size: 1em;">
-    partial interface AudioContext {
-      readonly attribute AudioNode destination;
-      readonly attribute double currentTime;
-      <span style="opacity: 0.5">// play audio buffers</span>
-      AudioBufferSourceNode createBufferSource();
-      <span style="opacity: 0.5">// change volume </span>
-      GainNode createGain();
-      <span style="opacity: 0.5">// play simple wave forms (sine, square, etc.) </span>
-      OscillatorNode createOscillator();
-      <span style="opacity: 0.5">// filter the sounds </span>
-      BiquadFilterNode createBiquadFilter();
-    }
+partial interface AudioContext {
+  readonly attribute AudioNode destination;
+  readonly attribute double currentTime;
+  <span style="opacity: 0.5">// play audio buffers</span>
+  AudioBufferSourceNode createBufferSource();
+  <span style="opacity: 0.5">// change volume </span>
+  GainNode createGain();
+  <span style="opacity: 0.5">// play simple wave forms (sine, square, etc.) </span>
+  OscillatorNode createOscillator();
+  <span style="opacity: 0.5">// filter the sounds </span>
+  BiquadFilterNode createBiquadFilter();
+}
             </pre>
           </section>
           <section>
             <pre style="font-size: 1em;">
-            partial interface OscillatorNode {
-              AudioNode connect(AudioNode node);
-              void disconnect(AudioNode node);
+partial interface OscillatorNode {
+  AudioNode connect(AudioNode node);
+  void disconnect(AudioNode node);
 
-              readonly AudioParam frequency;
-              readonly AudioParam detune;
-              enum OscillatorType type;
+  readonly AudioParam frequency;
+  readonly AudioParam detune;
+  enum OscillatorType type;
 
-              void start(double startTime);
-              void stop(double stopTime);
-            }
+  void start(double startTime);
+  void stop(double stopTime);
+}
             </pre>
           </section>
           <section>
             <pre style="font-size: 0.8em;">
 
+partial interface AudioParam {
+  attribute float value;
 
-    partial interface AudioParam {
-      attribute float value;
-
-      void setValueAtTime(float value, double time);
-      void exponentialRampToValueAtTime(float value, double time);
-      void linearRampToValueAtTime(float value, double time);
-      void setTargetAtTime(float value, double time, float constant);
-    }
+  void setValueAtTime(float value, double time);
+  void exponentialRampToValueAtTime(float value, double time);
+  void linearRampToValueAtTime(float value, double time);
+  void setTargetAtTime(float value, double time, float constant);
+}
             </pre>
           </section>
           <section>

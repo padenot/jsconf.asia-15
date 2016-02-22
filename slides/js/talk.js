@@ -563,23 +563,19 @@ function clap(sel, mult) {
 
   var parent = document.querySelector(sel);
 
-  var xhr = new XMLHttpRequest();
-  xhr.responseType = "arraybuffer";
-  xhr.onload = function() {
-      ac.ctx.decodeAudioData(xhr.response, function(buffer) {
-        var source = ac.ctx.createBufferSource();
-        source.buffer = buffer;
-        source.loop = true;
-        source.connect(ac.destination);
-        source.start();
-      });
-  }
-  xhr.open("GET", "/clap.wav");
-  xhr.send(null);
+fetch('clap.ogg').then((response) => {
+  response.arrayBuffer().then((arraybuffer) => {
+    ac.ctx.decodeAudioData(arraybuffer).then((buffer) => {
+      var source = ac.ctx.createBufferSource();
+      source.buffer = buffer;
+      source.loop = true;
+      source.connect(ac.destination);
+      source.start();
+    });
+  });
+});
 
   // Fx bug
   // document.querySelector(".present").style.opacity = "0.5";
 }
-
-setInterval(() => document.querySelector("body").style.backgroundColor = "white", 106);
 
